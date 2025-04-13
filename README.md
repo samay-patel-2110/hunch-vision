@@ -32,6 +32,12 @@ The main script is `emotion_blink_v1_mediapipe.py`. Run it with the following co
 ```bash
 python final/emotion_blink_v1_mediapipe.py
 ```
+Recommendation :
+1) Look straight at the camera and keep netural face during calibration
+2) Stay near to the laptop
+3) Make sure upper body is comfortably covered in the camera view
+4) Position camera at eye level, facing directly forward
+5) Maintain 0.5-1.0 meter distance from camera
 
 #### Command Line Arguments
 
@@ -50,67 +56,26 @@ python final/emotion_blink_v1_mediapipe.py --source 1 --width 1280 --height 720
 - Press `r` to reset blink counter
 - Press `c` to recalibrate the system
 
-## 2. Model Choice & Pipeline
+## 2. Aim
 
-### Detection Pipeline
-
-The system uses a multi-module approach:
-
-1. **Face and Body Detection**: MediaPipe models
-   - Face Mesh: 468 facial landmarks
-   - Pose: Body keypoints including shoulders
-
-2. **Eye State Detection**:
-   - Custom algorithm based on eyelid distances
+1. **Eye State Detection**:
    - Blink detection through temporal analysis
-   - Graph-based approach for reliable detection
+   - Blink Counts
 
-3. **Emotion Detection**:
+2. **Three way Emotion Detection**:
    - Rule-based algorithm using facial expressions
    - Valence-arousal model for emotion classification
    - Integrates eyebrow position, mouth shape, and eye state
+   - Emotions : Relaxed, Angry, Happy 
 
-4. **Posture Analysis**:
+3. **Posture Analysis**:
    - Shoulder position tracking using MediaPipe Pose
-   - Optical flow for smooth tracking between frames
+   - Point between chest tracking - Optical flow for smooth tracking between frames
    - Relative shoulder drop measurement for hunch detection
-
-### Library Choices
-
-- **MediaPipe**: Used for robust facial landmark and pose detection
-  - Provides consistent tracking even with partial occlusion
-  - Optimized for real-time performance
-
-- **OpenCV**: Used for video processing and visualization
-  - Efficient frame manipulation
-  - Drawing functions for analytics visualization
-
-- **Custom Algorithms**: For state detection and classification
-  - Calibration-based personalization
-  - Weighted multi-point analysis
-  - Temporal smoothing for stability
-
-## 3. Performance Metrics
-
-### System Requirements
-
-The application is designed to run on standard consumer hardware:
-
-- **Minimum Requirements**:
-  - CPU: Dual-core 2.0 GHz
-  - RAM: 4GB
-  - Camera: Standard webcam (720p)
-  - Storage: 100MB
-
-- **Recommended Requirements**:
-  - CPU: Quad-core 2.5 GHz+
-  - RAM: 8GB+
-  - Camera: HD webcam (1080p)
-  - Storage: 500MB
 
 ### Performance Benchmarks
 
-Tests conducted on a typical system (MacBook Pro, Intel Core i7, 16GB RAM, macOS 24.3.0):
+Tests conducted on a typical system (MacBook M2 Pro, 16GB RAM, macOS 24.3.0):
 
 - **CPU Usage**: 15-25% on average
 - **Memory Usage**: ~300MB
@@ -135,13 +100,17 @@ Tests conducted on a typical system (MacBook Pro, Intel Core i7, 16GB RAM, macOS
 
 #### Technical Limitations
 
-- **Processing Power**: Performance scales with CPU capability
-  - Lower-end systems may experience reduced frame rates
-  - Consider reducing resolution for better performance
+1. **Low Frame Rate**:
+   - Close other CPU-intensive applications
+   - Reduce resolution using `--width` and `--height` parameters
+   - Ensure adequate system cooling
 
-- **Calibration Requirements**: System requires initial calibration
-  - User must maintain neutral expression during calibration
-  - Recalibration needed when lighting or position changes significantly
+2. **Poor Detection Accuracy**:
+   - Improve lighting conditions
+   - for shoulder detection, If the person moves away from the latop as optical flow is utilized
+   - Adjust camera position to eye level
+   - Recalibrate using the 'c' key
+   - Remove facial occlusions if possible
 
 ### Validation Approach
 
@@ -155,7 +124,7 @@ The system was validated through multiple approaches:
 2. **Performance Monitoring**:
    - Built-in metrics tracking CPU, memory, and frame rate
    - Visualization of detection confidence
-   - Historical data plotting for stability analysis
+   - Manual Verification by plotting and stability analysis
 
 3. **Mitigation Strategies**:
    - Implemented temporal smoothing to reduce false positives
@@ -163,58 +132,7 @@ The system was validated through multiple approaches:
    - Calibration process for personalized baselines
    - Signal handlers for clean program termination
 
-## 4. Usage Tips
-
-### Optimal Setup
-
-- Position camera at eye level, facing directly forward
-- Ensure uniform, diffuse lighting on your face
-- Avoid backgrounds with moving elements
-- Maintain 0.5-1.0 meter distance from camera
-
-### Calibration
-
-The system requires an initial calibration period (5 seconds):
-- Maintain a neutral expression
-- Look directly at the camera
-- Keep shoulders level and posture upright
-- Remain still during the calibration process
-
-### Interpreting Results
-
-- **Eye State**: Displayed in top-right corner
-- **Blink Count**: Shows number of detected blinks
-- **Emotion**: Categorized as Relaxed, Happy, Angry, or Stressed
-- **Posture**: Indicates Good Posture, Slight Hunch, Medium Hunch, or Severe Hunch
-
-## 5. Troubleshooting
-
-### Common Issues
-
-1. **Low Frame Rate**:
-   - Close other CPU-intensive applications
-   - Reduce resolution using `--width` and `--height` parameters
-   - Ensure adequate system cooling
-
-2. **Poor Detection Accuracy**:
-   - Improve lighting conditions
-   - Adjust camera position to eye level
-   - Recalibrate using the 'c' key
-   - Remove facial occlusions if possible
-
-3. **Program Crashes**:
-   - Ensure all required libraries are installed
-   - Update to the latest version of MediaPipe
-   - Check camera access permissions
-
-## 6. License and Attribution
-
-This project uses the following open-source components:
-- MediaPipe (Apache 2.0 License)
-- OpenCV (BSD License)
-
 ## 7. Future Improvements
-
 - Multi-face tracking and analysis
 - Enhanced emotion detection using machine learning
 - Posture correction suggestions
