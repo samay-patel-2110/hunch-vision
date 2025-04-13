@@ -1,5 +1,5 @@
 """
-Emotion Detection Module - JUST EMOTION AND EYE BLINK DETECTION - OG
+Emotion Detection Module
 
 This module provides functions to detect emotions from facial landmarks using
 the valence-arousal model. It can be imported into other projects or run as
@@ -25,6 +25,7 @@ from emotion import EmotionDetector
 from hunch import HunchDetector
 import signal
 import sys
+from deepface import DeepFace
 
 # Global flag for termination
 terminate_program = False
@@ -422,7 +423,6 @@ class FaceAnalyzer:
         eye_plot = None
         expressions = None
         blink_detected = False
-        blink_rate_status = "Unknown"
         posture_info = {"calibrated": False, "hunch_state": "Unknown"}
         
         # Process shoulder posture if pose landmarks detected
@@ -461,11 +461,10 @@ class FaceAnalyzer:
                 
                 # Process emotion
                 emotion_info = self.emotion_detector.process_emotion(
-                    landmarks, expressions, blink_detected)
+                    landmarks, expressions)
                 valence = emotion_info["valence"]
                 arousal = emotion_info["arousal"]
                 emotion_name = emotion_info["emotion"]
-                blink_rate_status = emotion_info["blink_rate_status"]
                 
                 # Draw face landmarks
                 self.draw_landmarks(frame, face_landmarks, w, h)
@@ -626,8 +625,6 @@ class FaceAnalyzer:
             "eye_state": eye_state,
             "eye_plot": eye_plot,
             "expressions": expressions,
-            "blink_rate": self.emotion_detector.blink_rate,
-            "blink_rate_status": blink_rate_status,
             "posture_info": posture_info
         }
     

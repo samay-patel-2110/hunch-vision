@@ -30,7 +30,7 @@ pip install opencv-python mediapipe numpy psutil pygame
 The main script is `emotion_blink_v1_mediapipe.py`. Run it with the following command:
 
 ```bash
-python final/emotion_blink_v1_mediapipe.py
+python final/main.py
 ```
 Recommendation :
 1) Look straight at the camera and keep netural face during calibration
@@ -47,7 +47,7 @@ Recommendation :
 
 Example with custom source and resolution:
 ```bash
-python final/emotion_blink_v1_mediapipe.py --source 1 --width 1280 --height 720
+python final/main.py --source 1 --width 1280 --height 720
 ```
 
 ### Controls
@@ -79,7 +79,7 @@ Tests conducted on a typical system (MacBook M2 Pro, 16GB RAM, macOS 24.3.0):
 
 - **CPU Usage**: 15-25% on average
 - **Memory Usage**: ~300MB
-- **Average FPS**: 25-30 FPS at 720p resolution
+- **Average FPS**: 20-25 FPS at 720p resolution
 - **Startup Time**: ~2-3 seconds including initial calibration
 
 ### Limitations

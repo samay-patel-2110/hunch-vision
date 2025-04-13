@@ -1,6 +1,7 @@
 import time
 from collections import deque
 
+
 class EmotionDetector:
     """Class for detecting emotions based on facial expressions and blink rate."""
     
@@ -14,53 +15,17 @@ class EmotionDetector:
         self.emotions = {
             "Relaxed": (0, 255, 0),  # Green
             "Happy": (255, 255, 0),  # Yellow
-            "Angry": (0, 0, 255),    # Red
+            "Sad": (0, 0, 255),    # Red
             "Stressed": (0, 0, 255)  # Red (kept for backward compatibility)
         }
-        
-        # Initialize blink tracking
-        self.blink_times = deque(maxlen=60)  # Track last 60 blinks
-        self.blink_rate = 0.0  # Blinks per minute
         
         # Initialize emotion history
         self.emotion_history = deque(maxlen=history_size)
         self.valence_history = deque(maxlen=history_size)
         self.arousal_history = deque(maxlen=history_size)
         
-        # Blink rate thresholds
-        self.low_blink_threshold = 10  # Less than 10 blinks per minute is low
-        self.high_blink_threshold = 30  # More than 30 blinks per minute is high
     
-    def update_blink_rate(self, blink_detected):
-        """Update the blink rate based on detected blinks.
-        
-        Args:
-            blink_detected: Boolean indicating if a blink was detected
-        """
-        if blink_detected:
-            current_time = time.time()
-            self.blink_times.append(current_time)
-            
-            # Calculate blink rate (blinks per minute)
-            if len(self.blink_times) > 1:
-                time_span = current_time - self.blink_times[0]
-                if time_span > 0:
-                    self.blink_rate = (len(self.blink_times) - 1) * 60 / time_span
-    
-    def get_blink_rate_status(self):
-        """Get the status of the blink rate (Low, Normal, or High).
-        
-        Returns:
-            str: The status of the blink rate
-        """
-        if self.blink_rate < self.low_blink_threshold:
-            return "Low"
-        elif self.blink_rate > self.high_blink_threshold:
-            return "High"
-        else:
-            return "Normal"
-    
-    def calculate_emotion(self, expressions, blink_detected):
+    def calculate_emotion(self, expressions):
         """Calculate emotion based on facial expressions and blink rate.
         
         Args:
@@ -70,8 +35,6 @@ class EmotionDetector:
         Returns:
             tuple: (valence, arousal, emotion_name) values for the emotion
         """
-        # Update blink rate
-        self.update_blink_rate(blink_detected)
         
         # Get key expressions for emotion detection
         is_frowning = expressions.get("eyebrows_frowning", False) or expressions.get("frowning", False)
@@ -79,7 +42,7 @@ class EmotionDetector:
         
         # Determine emotion based on the specified rules
         if is_frowning and not is_smiling:
-            emotion_name = "Angry"
+            emotion_name = "Sad"
             valence = -0.8
             arousal = 0.8
         elif not is_frowning and is_smiling:
@@ -120,32 +83,27 @@ class EmotionDetector:
         else:
             return "Stressed"
     
-    def process_emotion(self, landmarks, expressions, blink_detected):
+    def process_emotion(self, landmarks, expressions):
         """Process emotion based on facial landmarks and expressions.
         
         Args:
             landmarks: numpy array of facial landmarks
             expressions: Dictionary containing facial expression information
-            blink_detected: Boolean indicating if a blink was detected
             
         Returns:
             dict: A dictionary containing:
                 - valence: The calculated valence value (-1 to 1)
                 - arousal: The calculated arousal value (-1 to 1)
                 - emotion: The detected emotion name
-                - blink_rate_status: The status of the blink rate (Low, Normal, High)
+                
         """
         # Calculate emotion
-        valence, arousal, emotion_name = self.calculate_emotion(expressions, blink_detected)
-        
-        # Get blink rate status
-        blink_rate_status = self.get_blink_rate_status()
+        valence, arousal, emotion_name = self.calculate_emotion(expressions)
         
         return {
             "valence": valence,
             "arousal": arousal,
-            "emotion": emotion_name,
-            "blink_rate_status": blink_rate_status
+            "emotion": emotion_name
         }
 
 if __name__ == "__main__":
