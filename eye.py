@@ -205,92 +205,7 @@ class EyeStateDetector:
                 # Set baseline for eyebrow to eye distance (frowness)
                 self.baseline_left_eyebrow_eye_distance = left_eyebrow_eye_distance
                 self.baseline_right_eyebrow_eye_distance = right_eyebrow_eye_distance
-                
-                # Calculate additional metrics for frowness detection
-                # 1. Multi-point eyebrow to eye distances
-                left_eyebrow_eye_points = []
-                for i, eb_point in enumerate(self.left_eyebrow_landmarks):
-                    if i < len(self.left_eye_upper_landmarks):
-                        eye_point = self.left_eye_upper_landmarks[i]
-                        distance = np.linalg.norm(landmarks[eb_point] - landmarks[eye_point]) / face_size
-                        left_eyebrow_eye_points.append(distance)
-                
-                right_eyebrow_eye_points = []
-                for i, eb_point in enumerate(self.right_eyebrow_landmarks):
-                    if i < len(self.right_eye_upper_landmarks):
-                        eye_point = self.right_eye_upper_landmarks[i]
-                        distance = np.linalg.norm(landmarks[eb_point] - landmarks[eye_point]) / face_size
-                        right_eyebrow_eye_points.append(distance)
-                
-                # 2. Measure eyebrow curvature (how much the eyebrow arches)
-                # Use the middle 3 points of the eyebrow for curvature
-                if len(self.left_eyebrow_landmarks) >= 3:
-                    mid_idx = len(self.left_eyebrow_landmarks) // 2
-                    left_pts = [landmarks[self.left_eyebrow_landmarks[mid_idx-1]], 
-                               landmarks[self.left_eyebrow_landmarks[mid_idx]], 
-                               landmarks[self.left_eyebrow_landmarks[mid_idx+1]]]
-                    
-                    # Extract just the x,y coordinates (ignoring z)
-                    left_p0 = left_pts[0][:2]  # First point (x,y only)
-                    left_p1 = left_pts[1][:2]  # Middle point (x,y only)
-                    left_p2 = left_pts[2][:2]  # Last point (x,y only)
-                    
-                    # Calculate how much the middle point deviates from the line between the other two
-                    left_line_vector = left_p2 - left_p0
-                    left_normal = np.array([-left_line_vector[1], left_line_vector[0]])
-                    left_normal = left_normal / max(0.001, np.linalg.norm(left_normal))
-                    left_middle_to_line = np.abs(np.dot(left_p1 - left_p0, left_normal))
-                    left_eyebrow_curvature = left_middle_to_line / face_size
-                else:
-                    left_eyebrow_curvature = 0.0
-                
-                if len(self.right_eyebrow_landmarks) >= 3:
-                    mid_idx = len(self.right_eyebrow_landmarks) // 2
-                    right_pts = [landmarks[self.right_eyebrow_landmarks[mid_idx-1]], 
-                                landmarks[self.right_eyebrow_landmarks[mid_idx]], 
-                                landmarks[self.right_eyebrow_landmarks[mid_idx+1]]]
-                    
-                    # Extract just the x,y coordinates (ignoring z)
-                    right_p0 = right_pts[0][:2]  # First point (x,y only)
-                    right_p1 = right_pts[1][:2]  # Middle point (x,y only)
-                    right_p2 = right_pts[2][:2]  # Last point (x,y only)
-                    
-                    # Calculate how much the middle point deviates from the line between the other two
-                    right_line_vector = right_p2 - right_p0
-                    right_normal = np.array([-right_line_vector[1], right_line_vector[0]])
-                    right_normal = right_normal / max(0.001, np.linalg.norm(right_normal))
-                    right_middle_to_line = np.abs(np.dot(right_p1 - right_p0, right_normal))
-                    right_eyebrow_curvature = right_middle_to_line / face_size
-                else:
-                    right_eyebrow_curvature = 0.0
-                
-                # 3. Measure forehead wrinkle indicators
-                # Calculate vertical distances between forehead points and eyebrows
-                forehead_wrinkle = 0.0
-                if self.left_forehead_landmarks and self.left_eyebrow_landmarks:
-                    for i, f_point in enumerate(self.left_forehead_landmarks):
-                        if i < len(self.left_eyebrow_landmarks):
-                            eb_point = self.left_eyebrow_landmarks[i]
-                            forehead_wrinkle += np.linalg.norm(landmarks[f_point] - landmarks[eb_point]) / face_size
-                
-                if self.right_forehead_landmarks and self.right_eyebrow_landmarks:
-                    for i, f_point in enumerate(self.right_forehead_landmarks):
-                        if i < len(self.right_eyebrow_landmarks):
-                            eb_point = self.right_eyebrow_landmarks[i]
-                            forehead_wrinkle += np.linalg.norm(landmarks[f_point] - landmarks[eb_point]) / face_size
-                
-                forehead_wrinkle /= max(1, len(self.left_forehead_landmarks) + len(self.right_forehead_landmarks))
-                
-                # If calibration is complete, store all these baseline values
-                self.baseline_left_eyebrow_eye_points = left_eyebrow_eye_points
-                self.baseline_right_eyebrow_eye_points = right_eyebrow_eye_points
-                self.baseline_left_eyebrow_curvature = left_eyebrow_curvature
-                self.baseline_right_eyebrow_curvature = right_eyebrow_curvature
-                self.baseline_forehead_wrinkle = forehead_wrinkle
-                
-                # Log additional metrics
-                print(f"Eyebrow curvature (L/R): {left_eyebrow_curvature:.4f}/{right_eyebrow_curvature:.4f}")
-                print(f"Forehead wrinkle baseline: {forehead_wrinkle:.4f}")
+
                 
                 self.calibrated = True
                 self.start_time = time.time()
@@ -392,188 +307,18 @@ class EyeStateDetector:
         # Calculate relative eyebrow to eye distance (frowness)
         relative_left_eyebrow_eye_distance = left_eyebrow_eye_distance / self.baseline_left_eyebrow_eye_distance
         relative_right_eyebrow_eye_distance = right_eyebrow_eye_distance / self.baseline_right_eyebrow_eye_distance
-        
-        # Enhanced frowness detection with multiple points
-        # 1. Multi-point eyebrow to eye distances
-        left_eyebrow_eye_points = []
-        for i, eb_point in enumerate(self.left_eyebrow_landmarks):
-            if i < len(self.left_eye_upper_landmarks):
-                eye_point = self.left_eye_upper_landmarks[i]
-                distance = np.linalg.norm(landmarks[eb_point] - landmarks[eye_point]) / face_size
-                left_eyebrow_eye_points.append(distance)
-        
-        right_eyebrow_eye_points = []
-        for i, eb_point in enumerate(self.right_eyebrow_landmarks):
-            if i < len(self.right_eye_upper_landmarks):
-                eye_point = self.right_eye_upper_landmarks[i]
-                distance = np.linalg.norm(landmarks[eb_point] - landmarks[eye_point]) / face_size
-                right_eyebrow_eye_points.append(distance)
-        
-        # Calculate relative distances compared to baseline
-        relative_left_points = []
-        for i, distance in enumerate(left_eyebrow_eye_points):
-            if i < len(self.baseline_left_eyebrow_eye_points):
-                relative = distance / max(0.001, self.baseline_left_eyebrow_eye_points[i])
-                relative_left_points.append(relative)
-        
-        relative_right_points = []
-        for i, distance in enumerate(right_eyebrow_eye_points):
-            if i < len(self.baseline_right_eyebrow_eye_points):
-                relative = distance / max(0.001, self.baseline_right_eyebrow_eye_points[i])
-                relative_right_points.append(relative)
-        
-        # Apply weights to the eyebrow-eye measurements (weighted average)
-        weighted_left_depression = 0.0
-        weight_sum_left = 0.0
-        for i, relative in enumerate(relative_left_points):
-            if i < len(self.eyebrow_point_weights):
-                weight = self.eyebrow_point_weights[i]
-                weighted_left_depression += relative * weight
-                weight_sum_left += weight
-                
-        weighted_right_depression = 0.0
-        weight_sum_right = 0.0
-        for i, relative in enumerate(relative_right_points):
-            if i < len(self.eyebrow_point_weights):
-                weight = self.eyebrow_point_weights[i]
-                weighted_right_depression += relative * weight
-                weight_sum_right += weight
-        
-        # Normalize by weight sum
-        if weight_sum_left > 0:
-            weighted_left_depression /= weight_sum_left
-        if weight_sum_right > 0:
-            weighted_right_depression /= weight_sum_right
             
-        # Calculate weighted average across both eyebrows
-        weighted_eyebrow_depression = (weighted_left_depression + weighted_right_depression) / 2
+        left_margin = relative_left_eyebrow_eye_distance - self.eyebrow_frown_threshold
+        right_margin = relative_right_eyebrow_eye_distance - self.eyebrow_frown_threshold
         
-        # 2. Calculate eyebrow curvature (focus on inner parts for frowning)
-        if len(self.left_eyebrow_landmarks) >= 3:
-            mid_idx = len(self.left_eyebrow_landmarks) // 2
-            left_pts = [landmarks[self.left_eyebrow_landmarks[mid_idx-1]], 
-                       landmarks[self.left_eyebrow_landmarks[mid_idx]], 
-                       landmarks[self.left_eyebrow_landmarks[mid_idx+1]]]
-            
-            # Extract just the x,y coordinates (ignoring z)
-            left_p0 = left_pts[0][:2]  # First point (x,y only)
-            left_p1 = left_pts[1][:2]  # Middle point (x,y only)
-            left_p2 = left_pts[2][:2]  # Last point (x,y only)
-            
-            # Calculate how much the middle point deviates from the line between the other two
-            left_line_vector = left_p2 - left_p0
-            left_normal = np.array([-left_line_vector[1], left_line_vector[0]])
-            left_normal = left_normal / max(0.001, np.linalg.norm(left_normal))
-            left_middle_to_line = np.abs(np.dot(left_p1 - left_p0, left_normal))
-            left_eyebrow_curvature = left_middle_to_line / face_size
+        if left_margin < 0 and right_margin < 0:
+            is_frowning = True
+        elif left_margin < 0:
+            is_frowning = True
+        elif right_margin < 0:
+            is_frowning = True
         else:
-            left_eyebrow_curvature = 0.0
-        
-        if len(self.right_eyebrow_landmarks) >= 3:
-            mid_idx = len(self.right_eyebrow_landmarks) // 2
-            right_pts = [landmarks[self.right_eyebrow_landmarks[mid_idx-1]], 
-                        landmarks[self.right_eyebrow_landmarks[mid_idx]], 
-                        landmarks[self.right_eyebrow_landmarks[mid_idx+1]]]
-            
-            # Extract just the x,y coordinates (ignoring z)
-            right_p0 = right_pts[0][:2]  # First point (x,y only)
-            right_p1 = right_pts[1][:2]  # Middle point (x,y only)
-            right_p2 = right_pts[2][:2]  # Last point (x,y only)
-            
-            # Calculate how much the middle point deviates from the line between the other two
-            right_line_vector = right_p2 - right_p0
-            right_normal = np.array([-right_line_vector[1], right_line_vector[0]])
-            right_normal = right_normal / max(0.001, np.linalg.norm(right_normal))
-            right_middle_to_line = np.abs(np.dot(right_p1 - right_p0, right_normal))
-            right_eyebrow_curvature = right_middle_to_line / face_size
-        else:
-            right_eyebrow_curvature = 0.0
-        
-        # Calculate relative curvature (lower value means more frowning)
-        relative_left_curvature = left_eyebrow_curvature / max(0.001, self.baseline_left_eyebrow_curvature)
-        relative_right_curvature = right_eyebrow_curvature / max(0.001, self.baseline_right_eyebrow_curvature)
-        eyebrow_curvature = (relative_left_curvature + relative_right_curvature) / 2
-        
-        # 3. Measure forehead wrinkle indicators
-        forehead_wrinkle = 0.0
-        wrinkle_count = 0
-        if self.left_forehead_landmarks and self.left_eyebrow_landmarks:
-            for i, f_point in enumerate(self.left_forehead_landmarks):
-                if i < len(self.left_eyebrow_landmarks):
-                    eb_point = self.left_eyebrow_landmarks[i]
-                    forehead_wrinkle += np.linalg.norm(landmarks[f_point] - landmarks[eb_point]) / face_size
-        
-        if self.right_forehead_landmarks and self.right_eyebrow_landmarks:
-            for i, f_point in enumerate(self.right_forehead_landmarks):
-                if i < len(self.right_eyebrow_landmarks):
-                    eb_point = self.right_eyebrow_landmarks[i]
-                    forehead_wrinkle += np.linalg.norm(landmarks[f_point] - landmarks[eb_point]) / face_size
-        
-        forehead_wrinkle /= max(1, wrinkle_count)
-        relative_forehead_wrinkle = forehead_wrinkle / max(0.001, self.baseline_forehead_wrinkle)
-        
-        # Add to history for plotting
-        self.eyebrow_curvature_history.append(eyebrow_curvature)
-        self.forehead_wrinkle_history.append(relative_forehead_wrinkle)
-        
-        # Calculate detailed frowness using weighted contributions from multiple metrics
-        # For inner eyebrow depression, focus on the innermost points (first 2 indices)
-        inner_left_depression = 0
-        inner_right_depression = 0
-        
-        if relative_left_points and relative_right_points:
-            # Focus on innermost points (first 2) which are most important for frowning
-            inner_left_depression = sum(relative_left_points[:2]) / min(2, len(relative_left_points))
-            inner_right_depression = sum(relative_right_points[:2]) / min(2, len(relative_right_points))
-        
-        inner_eyebrow_depression = (inner_left_depression + inner_right_depression) / 2
-        
-        # Use the weighted eyebrow depression for more accurate frowness detection
-        # Emphasize the inner points for more responsive detection
-        inner_weight_factor = 1.2  # Give more importance to inner points
-        inner_weighted_depression = ((relative_left_points[0] * 0.5 + relative_right_points[0] * 0.5) * inner_weight_factor 
-                                   if relative_left_points and relative_right_points else 1.0)
-        
-        frowness_detailed = (
-            self.frowness_weights["eyebrow_distance"] * relative_eyebrow_distance +
-            self.frowness_weights["eyebrow_eye_distance"] * (weighted_eyebrow_depression * 0.7 + inner_weighted_depression * 0.3) +
-            self.frowness_weights["eyebrow_curvature"] * eyebrow_curvature +
-            self.frowness_weights["forehead_wrinkle"] * relative_forehead_wrinkle
-        )
-        
-        # Perform temporal smoothing for more stable detection
-        # Raw frowning state based on current frame
-        raw_is_frowning = frowness_detailed <= self.eyebrow_frown_threshold
-        
-        # Add to history
-        self.frowning_history.append(raw_is_frowning)
-        
-        # Calculate consistency in recent frames
-        if len(self.frowning_history) >= 3:
-            # Count the number of frowning frames in history
-            frowning_count = sum(1 for f in self.frowning_history if f)
-            
-            # If all frames agree, high confidence
-            if frowning_count == 0 or frowning_count == len(self.frowning_history):
-                self.frowning_confidence = 1.0
-            # If majority of frames agree, medium confidence
-            elif frowning_count > len(self.frowning_history) / 2:
-                self.frowning_confidence = 0.7
-                raw_is_frowning = True
-            elif frowning_count < len(self.frowning_history) / 2:
-                self.frowning_confidence = 0.7
-                raw_is_frowning = False
-            # If exactly half, maintain previous state with reduced confidence
-            else:
-                self.frowning_confidence = 0.5
-        
-        # Determine final frowning state based on debouncing
-        # Only change state if we have same state for multiple consecutive frames
-        # This prevents flickering between states
-        is_frowning = raw_is_frowning
-        
-        # Use binary value for intensity now
-        frowness_intensity = 1.0 if is_frowning else 0.0
+            is_frowning = False
         
         # Keep original frowness calculation for backward compatibility
         frowness = (relative_left_eyebrow_eye_distance + relative_right_eyebrow_eye_distance) / 2
@@ -599,14 +344,7 @@ class EyeStateDetector:
             "relative_left_eyebrow_eye_distance": relative_left_eyebrow_eye_distance,
             "relative_right_eyebrow_eye_distance": relative_right_eyebrow_eye_distance,
             "frowness": frowness,
-            "frowness_detailed": frowness_detailed,
-            "frowness_intensity": frowness_intensity,
-            "eyebrow_curvature": eyebrow_curvature,
-            "forehead_wrinkle": relative_forehead_wrinkle,
-            "inner_eyebrow_depression": inner_eyebrow_depression,
-            "weighted_eyebrow_depression": weighted_eyebrow_depression,
             "frowness_confidence": self.frowning_confidence,
-            "raw_is_frowning": raw_is_frowning,
             "is_frowning": is_frowning
         }
     

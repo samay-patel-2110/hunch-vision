@@ -35,9 +35,10 @@ class EmotionDetector:
         Returns:
             tuple: (valence, arousal, emotion_name) values for the emotion
         """
-        
         # Get key expressions for emotion detection
-        is_frowning = expressions.get("eyebrows_frowning", False) or expressions.get("frowning", False)
+        # Use the smoothed eyebrow frowness detection from eye.py
+        is_frowning = expressions.get("is_frowning", False)  
+        # is_frowning = expressions.get("raw_is_frowning", False) or expressions.get("frowning", False) # Old logic
         is_smiling = expressions.get("smiling", False)
         
         # Determine emotion based on the specified rules
@@ -63,6 +64,8 @@ class EmotionDetector:
         self.valence_history.append(valence)
         self.arousal_history.append(arousal)
         self.emotion_history.append(emotion_name)
+        
+        
         
         return valence, arousal, emotion_name
     

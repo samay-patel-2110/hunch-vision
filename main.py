@@ -25,7 +25,6 @@ from emotion import EmotionDetector
 from hunch import HunchDetector
 import signal
 import sys
-from deepface import DeepFace
 
 # Global flag for termination
 terminate_program = False
@@ -557,7 +556,7 @@ class FaceAnalyzer:
                 y_offset += 30
                 if emotion_name == "Relaxed":
                     color = (0, 255, 0)  # Green
-                else:  # Stressed
+                else: 
                     color = (0, 0, 255)  # Red
                 cv2.putText(frame, f"Emotion: {emotion_name}", (10, y_offset),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
