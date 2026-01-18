@@ -1,4 +1,5 @@
-# Emotion and Posture Detection System
+# A companion for long hours of laptop use!
+Non contact respiratory and posture analysis and monitoring
 
 A real-time monitoring system that detects emotions, eye states, blink patterns, and posture. The system provides feedback on emotional states and posture quality to help improve user well-being during computer usage.
 
