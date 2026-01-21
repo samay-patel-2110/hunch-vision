@@ -134,8 +134,6 @@ The system was validated through multiple approaches:
    - Signal handlers for clean program termination
 
 ## 7. Future Improvements
-- Multi-face tracking and analysis
-- Enhanced emotion detection using machine learning
-- Posture correction suggestions
-- Session analytics and reporting
-- Integration with break reminder systems 
+- C++ for faster inference and image transport
+- analysing and creating reports for wellbeing analytics
+- Model fine-tuning on a custom dataset (approx 100 videos each of 5 minutes)
