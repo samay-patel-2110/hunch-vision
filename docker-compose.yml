@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  posture_cv:
+    build: .
+    container_name: hunch_emo_detector
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
+    devices:
+      - /dev/video0:/dev/video0   # give container access to host webcam
+    command: python main.py

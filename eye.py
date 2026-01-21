@@ -3,8 +3,6 @@ import cv2
 import mediapipe as mp
 import time
 from collections import deque
-import argparse
-import psutil  # For CPU and memory usage tracking
 
 class EyeStateDetector:
     """Class for detecting eye states and blinks from facial landmarks."""
@@ -385,7 +383,7 @@ class EyeStateDetector:
             if self.closed_frame_counter >= self.blink_min_duration:
                 # This is a valid blink
                 self.blink_counter += 1
-                self.play_audio_cue()
+                # self.play_audio_cue()
                 self.blink_detected = True
                 self.closed_frame_counter = 0
                 self.blink_cooldown_counter = self.blink_cooldown

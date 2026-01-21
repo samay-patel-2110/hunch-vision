@@ -59,21 +59,21 @@ class HunchDetector:
         self.hunch_duration = 0
         self.last_update_time = time.time()
         
-        # Initialize audio for cue (matching hunch_mediapipe.py)
-        try:
-            import pygame
-            pygame.mixer.init()
-            self.audio_initialized = True
-            try:
-                self.cue_sound = pygame.mixer.Sound("cue.mp3")
-                print("Successfully loaded audio cue")
-            except Exception as e:
-                print(f"Error loading audio cue: {e}")
-                self.cue_sound = None
-        except ImportError:
-            print("Pygame not available, audio cues disabled")
-            self.audio_initialized = False
-            self.cue_sound = None
+        # # Initialize audio for cue
+        # try:
+        #     import pygame
+        #     pygame.mixer.init()
+        #     self.audio_initialized = True
+        #     try:
+        #         self.cue_sound = pygame.mixer.Sound("cue.mp3")
+        #         print("Successfully loaded audio cue")
+        #     except Exception as e:
+        #         print(f"Error loading audio cue: {e}")
+        #         self.cue_sound = None
+        # except ImportError:
+        #     print("Pygame not available, audio cues disabled")
+        #     self.audio_initialized = False
+        #     self.cue_sound = None
 
         # Audio control variables
         self.last_audio_time = 0
@@ -242,20 +242,20 @@ class HunchDetector:
         
         return tracked_point
     
-    def play_audio_cue(self):
-        """Play audio cue when hunched posture is detected."""
-        if self.cue_sound is None or not self.audio_initialized:
-            return
+    # def play_audio_cue(self):
+    #     """Play audio cue when hunched posture is detected."""
+    #     if self.cue_sound is None or not self.audio_initialized:
+    #         return
         
-        try:
-            import threading
-            # Play in a separate thread to avoid blocking
-            def play_sound():
-                self.cue_sound.play()
+    #     try:
+    #         import threading
+    #         # Play in a separate thread to avoid blocking
+    #         def play_sound():
+    #             self.cue_sound.play()
                 
-            threading.Thread(target=play_sound).start()
-        except Exception as e:
-            print(f"Error playing audio cue: {e}")
+    #         threading.Thread(target=play_sound).start()
+    #     except Exception as e:
+    #         print(f"Error playing audio cue: {e}")
     
     def process_posture(self, landmarks, frame=None):
         """Process posture based on shoulder landmarks.
@@ -329,10 +329,10 @@ class HunchDetector:
                 if self.start_hunch_time is None:
                     self.start_hunch_time = current_time
                     
-                    # Play audio cue when transitioning to hunched state
-                    if not self.was_hunched and (current_time - self.last_audio_time > self.audio_cooldown):
-                        self.play_audio_cue()
-                        self.last_audio_time = current_time
+                    # # Play audio cue when transitioning to hunched state
+                    # if not self.was_hunched and (current_time - self.last_audio_time > self.audio_cooldown):
+                    #     self.play_audio_cue()
+                    #     self.last_audio_time = current_time
                 
                 self.hunch_duration = current_time - self.start_hunch_time
                 self.posture_stats["hunched_time"] += dt

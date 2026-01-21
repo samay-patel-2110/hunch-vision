@@ -1,38 +1,26 @@
-# A companion for long hours of laptop use!
-Non contact respiratory and posture analysis and monitoring
+# A Companion to your long computer hours!
 
 A real-time monitoring system that detects emotions, eye states, blink patterns, and posture. The system provides feedback on emotional states and posture quality to help improve user well-being during computer usage.
 
-## 1. System Setup
+## 1. System Setup and execution
 
-### Requirements
-
-- **Python Version**: 3.8+ recommended
-- **Required Libraries**:
-  - OpenCV (`cv2`): 4.5.0+
-  - MediaPipe: 0.8.9+
-  - NumPy: 1.19.0+
-  - psutil: 5.8.0+
-  - pygame (optional, for audio feedback): 2.0.0+
-
-### Installation
-
+Docker (Install Docker and then run from project directory)
+(for macOS use manual because docker cannot access videocam)
 ```bash
-# Create a virtual environment (recommended)
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install required packages
-pip install opencv-python mediapipe numpy psutil pygame
+docker-compose build --no-cache
+docker-compose up
 ```
 
-### Running the Demo
-
-The main script is `.py`. Run it with the following command:
-
+Manual (pip)
 ```bash
+python -m venv venv
+source venv/bin/activate   # Linux/macOS
+venv\Scripts\activate      # Windows
+pip install -r requirements.txt
 python main.py
 ```
+
+
 Recommendation :
 1) Look straight at the camera and keep netural face during calibration
 2) Stay near to the laptop
@@ -79,7 +67,7 @@ python main.py --source 1 --width 1280 --height 720
 Tests conducted on a typical system (MacBook M2 Pro, 16GB RAM, macOS 24.3.0):
 
 - **CPU Usage**: 15-25% on average
-- **Memory Usage**: ~300MB
+- **Memory Usage**: ~600MB
 - **Average FPS**: 20-25 FPS at 720p resolution
 - **Startup Time**: ~2-3 seconds including initial calibration
 
@@ -136,4 +124,4 @@ The system was validated through multiple approaches:
 ## 7. Future Improvements
 - C++ for faster inference and image transport
 - analysing and creating reports for wellbeing analytics
-- Model fine-tuning on a custom dataset (approx 100 videos each of 5 minutes)
+- Yolo model fine-tuning on a custom dataset and compression (approx 100 videos each of 5 minutes)

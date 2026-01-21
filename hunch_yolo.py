@@ -14,8 +14,6 @@ import math
 import time
 from collections import deque
 from ultralytics import YOLO
-import pygame
-import threading
 
 class PostureDetectorYOLO:
     def __init__(self, model_path="./yolov11n-pose.pt"):
@@ -29,14 +27,14 @@ class PostureDetectorYOLO:
             print(f"Error loading model: {e}")
             raise
         
-        # Initialize audio for cue
-        pygame.mixer.init()
-        try:
-            self.cue_sound = pygame.mixer.Sound("cue.mp3")
-            print("Successfully loaded audio cue")
-        except Exception as e:
-            print(f"Error loading audio cue: {e}")
-            self.cue_sound = None
+        # # Initialize audio for cue, it can be annoying but if you like the sound uncomment it.
+        # pygame.mixer.init()
+        # try:
+        #     self.cue_sound = pygame.mixer.Sound("cue.mp3")
+        #     print("Successfully loaded audio cue")
+        # except Exception as e:
+        #     print(f"Error loading audio cue: {e}")
+        #     self.cue_sound = None
             
         # Audio control variables
         self.last_audio_time = 0
@@ -545,16 +543,17 @@ class PostureDetectorYOLO:
         
         return frame
     
-    def play_audio_cue(self):
-        """Play audio cue in a separate thread to avoid blocking the main processing"""
-        if self.cue_sound is None:
-            return
+    # uncomment and add pygame, the noise can be annoying sometimes.
+    # def play_audio_cue(self):
+    #     """Play audio cue in a separate thread to avoid blocking the main processing"""
+    #     if self.cue_sound is None:
+    #         return
             
-        # Play in a separate thread to avoid blocking
-        def play_sound():
-            self.cue_sound.play()
+    #     # Play in a separate thread to avoid blocking
+    #     def play_sound():
+    #         self.cue_sound.play()
             
-        threading.Thread(target=play_sound).start()
+    #     threading.Thread(target=play_sound).start()
     
     def process_frame(self, frame):
         """Process a single frame to detect posture"""
@@ -620,7 +619,7 @@ class PostureDetectorYOLO:
                     current_time = time.time()
                     if posture == "Hunched" and not self.was_hunched:
                         if current_time - self.last_audio_time > self.audio_cooldown:
-                            self.play_audio_cue()
+                            # self.play_audio_cue()
                             self.last_audio_time = current_time
                     
                     # Update previous state
@@ -816,7 +815,7 @@ class PostureDetectorYOLO:
             # Clean up
             cap.release()
             cv2.destroyAllWindows()
-            pygame.mixer.quit()  # Clean up pygame resources
+            # pygame.mixer.quit()  # Clean up pygame resources
 
 if __name__ == "__main__":
     detector = PostureDetectorYOLO()
