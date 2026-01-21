@@ -28,10 +28,10 @@ pip install opencv-python mediapipe numpy psutil pygame
 
 ### Running the Demo
 
-The main script is `emotion_blink_v1_mediapipe.py`. Run it with the following command:
+The main script is `.py`. Run it with the following command:
 
 ```bash
-python final/main.py
+python main.py
 ```
 Recommendation :
 1) Look straight at the camera and keep netural face during calibration
@@ -48,7 +48,7 @@ Recommendation :
 
 Example with custom source and resolution:
 ```bash
-python final/main.py --source 1 --width 1280 --height 720
+python main.py --source 1 --width 1280 --height 720
 ```
 
 ### Controls
